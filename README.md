@@ -1,68 +1,32 @@
 # public-ai-skills
 
-A collection of AI workflow skills for structured engineering collaboration between engineers and AI coding assistants.
+A portable workflow for engineers and AI coding assistants, from intake through implementation, verification and shipping.
 
----
+## AI–Engineer Collaboration
 
-## Skills
+Start with the [numbered guide](./ai-workflow/guide/README.md) or the [workspace setup skill](./ai-workflow/SKILL.md). The bundle includes:
 
-### [`ai-workflow/`](./ai-workflow/) — AI–Engineer Collaboration
+- Eleven numbered workflow pages, with optional branches for design challenge and proof of concept.
+- Five [persona prompts](./ai-workflow/agents/README.md), with example model tiers.
+- Fourteen [workflow skills](./ai-workflow/skills/) for project intake, writing, review, implementation, verification and handoff.
+- Eight [project templates](./ai-workflow/templates/), the [guidelines](./ai-workflow/GUIDELINES.md), and an [architecture standard](./ai-workflow/standards/architecture.md).
+- Optional [document lint](./ai-workflow/scripts/README.md) for staged docs and CI.
 
-A structured, phase-based workflow for working with AI coding assistants on non-trivial engineering tasks. Covers the full engineering lifecycle from problem framing through PR planning.
+## Optional tools
 
-The skill can either **provision a new docs workspace** from scratch or **onboard an AI agent** into an existing one.
+- [Annotate Doc](./ai-workflow/skills/annotate-doc/SKILL.md) and [Stop Annotate Doc](./ai-workflow/skills/stop-annotate-doc/SKILL.md) support local browser review. [Install Plannotator](./ai-workflow/skills/annotate-doc/install.md) in binary-only mode.
+- [Claude Code terminal hooks](./ai-workflow/hooks/README.md) include the runnable iTerm2 status adapter and activation instructions.
+- [GitHub Stacked PRs](./ai-workflow/skills/gh-stack/SKILL.md) covers dependent PRs where the repository supports them. [Cleanup Worktrees](./ai-workflow/skills/cleanup-worktrees/SKILL.md) removes confirmed finished checkouts.
 
-**Includes**: `SKILL.md`, `GUIDELINES.md`, `workflows/ai-engineer-collaboration.md`, and 5 document templates (research, RFC, impl plan, POC simulation, PR plan).
+## Getting started
 
-**9-phase workflow**: Problem Framing → Assessment/Research → Ideation → RFC Writing → POC (optional) → Blocking Questions → Implementation Planning → Implementation → Verification → PR Planning
+1. Use public [`init-project`](./init-project/SKILL.md) to onboard a machine or user and set up or upgrade their docs workspace. It uses the bundled [`ai-workflow` setup instructions](./ai-workflow/SKILL.md).
+2. Once the workspace is ready, use [`start-project`](./ai-workflow/skills/start-project/SKILL.md) to create a project or [`resume-project`](./ai-workflow/skills/resume-project/SKILL.md) to continue one. `start-project` defines phases 0–9 and the conditional design challenge. The guide numbers are for navigation.
+3. For native skill discovery, install `ai-workflow/` as the setup skill and each desired `ai-workflow/skills/<name>/` directory as its own skill in your harness. Install the top-level `init-project/` entry point if you want to invoke onboarding by that name. If that name already creates projects in your existing setup, keep that installation and use `ai-workflow` to onboard.
+4. For Claude Code, follow the [workspace startup instructions](./ai-workflow/SKILL.md#start-the-workflow-in-claude-code). Use the [persona instructions](./ai-workflow/agents/README.md) to configure native agents or run the prompts in separate sessions.
 
----
-
-### [`init-project/`](./init-project/) — Init Project
-
-Bootstraps a new project folder in an existing docs workspace and drives the AI–Engineer Collaboration workflow from Phase 0. The user provides only a goal; the skill handles numbering, folder scaffolding, header fields, and phase sequencing.
-
-Requires an existing docs workspace (provisioned by `ai-workflow`).
-
----
-
-## Installation
-
-### OpenCode + OhMyOpenCode
-
-```bash
-# Copy individual skills into your skills directory
-cp -r ai-workflow ~/.config/opencode/skills/ai-workflow
-cp -r init-project ~/.config/opencode/skills/init-project
-```
-
-Then load by name in any session:
-
-```
-Use the ai-workflow skill to set up a new docs workspace.
-Use the init-project skill to start a new project.
-```
-
-### Claude Code
-
-```bash
-cp -r ai-workflow ~/.claude/skills/ai-workflow
-cp -r init-project ~/.claude/skills/init-project
-```
-
-### Any AI Assistant
-
-Point your AI to the `SKILL.md` inside the relevant skill folder.
-
----
-
-## How the skills work together
-
-1. **First time setup** — run `ai-workflow` to provision your docs workspace (creates `projects/`, `templates/`, `workflows/`, `GUIDELINES.md`)
-2. **Each new project** — run `init-project` to scaffold a numbered project folder and kick off the 9-phase workflow
-
----
+The Markdown workflow works without extra tools. The optional linter uses Python 3 and Git.
 
 ## License
 
-See [LICENSE](./LICENSE).
+[MIT](./LICENSE)

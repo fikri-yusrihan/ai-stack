@@ -1,12 +1,12 @@
 # Implementation Plan: [Feature Name]
 
+<!-- Status values: Draft | In Review | Approved | In Progress | Done | Superseded | Deferred | Cancelled — GUIDELINES.md § Document Status Lifecycle -->
 | Field | Value |
 |---|---|
 | **RFC** | [RFC](./02-rfc.md) |
 | **Module** | [module name] |
 | **Created** | YYYY-MM-DD |
-| **Status** | In Progress \| ✅ Complete |
-| **Session PWD** | [Working directory where this opencode session was opened — fill from env on session start] |
+| **Status** | Draft |
 
 ---
 
@@ -27,10 +27,22 @@
 
 | # | Question | Why it blocks | Options | Decision | Decided by | Reasoning |
 |---|---|---|---|---|---|---|
-| P0-1 | [Question] | [What it determines] | [A] / [B] | ⏳ Unresolved / ✅ [Decision] | `AI proposed` \| `[OWNER] confirmed` \| `[OWNER] chose` | [One sentence — why this option over the others] |
+| P0-1 | [Question] | [What it determines] | [A] / [B] | ⏳ Unresolved / ✅ [Decision] | `AI proposed` \| `Owner confirmed` \| `Owner chose` | [One sentence — why this option over the others] |
 | P0-2 | [Question] | [What it determines] | [A] / [B] | ⏳ Unresolved / ✅ [Decision] | | |
 
-> **Rule**: Do not start Phase 1 until all P0 items are ✅. "Decided by" = `[OWNER] confirmed` or `[OWNER] chose` is required before proceeding — AI proposals alone do not unblock.
+> **Rule**: Do not start Phase 1 until all P0 items are ✅. "Decided by" = `Owner confirmed` or `Owner chose` is required before proceeding — AI proposals alone do not unblock.
+
+---
+
+## Structure and Responsibilities
+
+> One row per new or changed unit, so structure is reviewed before code exists. Rules and checklist IDs: `standards/architecture.md`. This table is the design note from section 2 of the standard: name the architectural style you are applying (layered, ports and adapters, package by feature) and any pattern with the present problem it solves. Follow the research doc's `Structure conventions`; a unit that deviates from S1 to S9 (including any size trigger in S4) is named here with the reason. An unnamed deviation is a review finding. A task creates one responsibility, or lists the units it creates.
+
+**Style**: [the architectural style this area follows: layered / ports and adapters / package by feature / mixed] **Patterns**: [pattern and the present problem it solves, or "none"]
+
+| Unit | Package path | Responsibility (one sentence, no "and") | Depends on | Interface and why (S6) | Follows (nearest analogue) |
+|---|---|---|---|---|---|
+| `[ClassName]` | `[path/to/package]` | [what it does] | [collaborators] | [none / interface name: external I/O, stub, repo convention] | `[ExistingClass]` |
 
 ---
 
@@ -49,10 +61,10 @@
 **What**: [Exactly what to do]
 
 **File(s) to create/modify**:
-- `path/to/File.java` — [what changes]
+- `path/to/File.[ext]` — [what changes]
 
-```java
-// Concrete implementation sketch
+```text
+// Concrete implementation sketch (not required to be production-ready, but should be close)
 ```
 
 **Definition of done**:
@@ -102,12 +114,12 @@
 **What**: Inject [NewComponent] into [ExistingClass]. Replace [old mechanism] with [new mechanism].
 
 **Before**:
-```java
+```text
 // old code
 ```
 
 **After**:
-```java
+```text
 // new code
 ```
 
@@ -121,8 +133,8 @@
 ### Task N.2 — Delete dead code
 
 **Files to delete**:
-- `path/to/DeadFile.java`
-- `path/to/AnotherDeadFile.java`
+- `path/to/DeadFile.[ext]`
+- `path/to/AnotherDeadFile.[ext]`
 
 **Methods to delete from [ClassName]**:
 - `deadMethod1()`
@@ -134,37 +146,36 @@
 
 ### Task N.3 — Integration verification
 
-> Manual verification after all tests pass. Tests prove correctness; this proves nothing broke end-to-end.
+Run the relevant integration check on the approved test target. Record the setup command, test input, expected result and evidence in `06-verification.md`. Compare against the baseline where behavior must be preserved.
 
-```bash
-# Start the service
-./gradlew :[module]:bootRun
-
-# Hit the relevant endpoint with a real payload
-curl -X POST [endpoint] -d @test-payload.json
-```
 
 ---
 
 ## File Structure (final)
 
 ```
-[module]/src/main/java/[package]/
+[module]/[source-directory]/
 ├── [new-package]/
-│   ├── NewFile.java           ✅ new
-│   └── ModifiedFile.java      ✅ modified
+│   ├── NewFile.[ext]           ✅ new
+│   ├── AnotherNewFile.[ext]    ✅ new
+│   └── ModifiedFile.[ext]      ✅ modified
 └── [existing-package]/
-    └── ExistingFile.java      ✅ switch collapsed; dead methods deleted
+    └── ExistingFile.[ext]      ✅ switch collapsed; dead methods deleted
 ```
 
 **Deleted**:
-- `path/to/DeletedFile.java`
+- `path/to/DeletedFile.[ext]`
 
 ---
 
 ## Design Pivots
 
-> Fill this section whenever the implementation diverges from the RFC. Silence = the plan was followed exactly.
+> Fill this section whenever the implementation diverges from the RFC. A pivot is required here when the change affects:
+> - A public API contract or method signature
+> - A data structure shape used by more than one task
+> - The behavior of a component that other phases depend on
+>
+> Everything else: log briefly and keep going. Silence = the plan was followed exactly.
 
 | # | What changed | Why | Impact on remaining tasks | RFC updated? |
 |---|---|---|---|---|
@@ -186,4 +197,4 @@ curl -X POST [endpoint] -d @test-payload.json
 
 - [RFC](./02-rfc.md)
 - [Research doc](./01-research.md)
-- `FileName.java` — L[start]–L[end]: [relevant section]
+- `FileName.[ext]` — L[start]–L[end]: [relevant section]

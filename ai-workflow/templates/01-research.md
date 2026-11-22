@@ -1,19 +1,19 @@
 # Research: [Topic]
 
+<!-- Status values: Draft | In Review | Approved | In Progress | Done | Superseded | Deferred | Cancelled — GUIDELINES.md § Document Status Lifecycle -->
 | Field | Value |
 |---|---|
 | **Context** | [Service/module name and repo] |
 | **Date** | YYYY-MM-DD |
-| **Status** | Draft \| In Progress \| Final |
-| **Session PWD** | [Working directory where this opencode session was opened — fill from env on session start] |
+| **Status** | Draft |
 
 ---
 
 ## Problem Statement
 
-> One paragraph. What is broken, painful, or missing? Write this as a causal chain: name the specific code path, explain what it does wrong, trace that to the consequence. A reader should be able to verify or refute the problem by reading the referenced code.
+> One paragraph. What is broken, painful, or missing? Write this as a causal chain: name the specific code path, explain what it does, trace that to the bad outcome.
 >
-> Good: "`TripBookingPageLayout.generateLayoutPage()` contains a ~25-case switch on `rawComponent.getType()`. Every new component type requires changes in 3 files — the switch, the converter registry, and the schema. The switch has no exhaustiveness check, so a missing case silently returns null at runtime."
+> Good: "`DocumentRenderer.renderBlock()` contains a ~25-case switch on `block.type()`. Every new component type requires changes in 3 files — the switch, the converter registry, and the schema. The switch has no exhaustiveness check, so a missing case silently returns null at runtime."
 >
 > Bad: "The current code is hard to maintain."
 
@@ -25,8 +25,8 @@
 
 | File | Role |
 |---|---|
-| `FileName.java` | What it does — be specific about the method or class |
-| `AnotherFile.java` | What it does |
+| `FileName.[ext]` | What it does — be specific about the method or class |
+| `AnotherFile.[ext]` | What it does |
 
 ### Existing patterns found in codebase
 
@@ -37,11 +37,24 @@
 **[Pattern name]** — short description  
 `ClassName.methodName()` (L[n]–[n]): what it does and why it matters here.
 
-> List patterns that are relevant to the solution space. Both patterns to reuse AND patterns to avoid.
-
 **Absent patterns (confirmed not present)**:
-- No `SomePattern` anywhere in the repo
+- No `SomePattern` anywhere in the repo — confirmed by [search method]
 - No `SomeApproach` — confirmed by [search method]
+
+### Structure conventions
+
+> How the target repo organizes code today, from code you read (rules and survey method: `standards/architecture.md` § 5). Structured fields so they survive compaction. Write "absent" where something does not exist. Do not propose a structure here.
+
+| Field | Finding (with paths) |
+|---|---|
+| Organizing principle | [by feature / by layer / mixed — package tree to two levels] |
+| Layer sub-packages | [e.g. controller, service, repository, listener, model] |
+| Naming suffixes | [services, repositories, clients, listeners, models] |
+| Boundary style | [how interfaces and implementations are declared, and where each lives] |
+| Wiring style | [constructor injection / field injection / plain `new` / config classes] |
+| Nearest analogue | [closest small, cohesive existing feature, with paths] |
+| Outliers not to copy | [classes past the size triggers, with line counts] |
+| Test layout | [where tests sit, framework] |
 
 ### Constraints
 
@@ -60,8 +73,10 @@
 
 ## Approaches Evaluated
 
-> Evaluate at least 3 approaches. Include approaches you rejected — the reasoning belongs in writing.
+> Evaluate the status quo plus at least 3 other approaches. Include approaches you rejected — the reasoning belongs in writing.
 > Each approach should describe the mechanism and explain why it fits or doesn't fit this codebase specifically. Build toward the verdict; don't just list pros and cons.
+
+---
 
 ### Approach 0: Status Quo
 
@@ -75,7 +90,7 @@ Keep the current code unchanged.
 
 **Core idea**: [One sentence.]
 
-```java
+```text
 // Concrete sketch — illustrating the mechanism, not production code
 ```
 
@@ -128,16 +143,16 @@ Keep the current code unchanged.
 
 ## Open Questions
 
-> Questions that need answers before implementation can start. These become P0 items in the impl plan.
+> Questions that must be answered before implementation can start. These become P0 items in the impl plan.
 
-- [ ] [Question] — why it matters for the design
+- [ ] [Question] — why it matters, what the options are
 - [ ] [Question] — options and their implications
 
 ---
 
 ## Approach Selection Log
 
-> **Fill this section before closing Phase 2.** This is the decision record — not the RFC design, but the *reasoning path* that led there. A future agent reading this should understand why rejected approaches were rejected, and whether they're worth revisiting.
+> **Fill this section before closing Phase 2.** This is the decision record — not the design, but the reasoning path that led there. A future agent reading only this section should understand why rejected approaches were rejected and whether they're worth revisiting.
 >
 > **Phase exit condition**: Do not proceed to RFC until this section is complete.
 
@@ -146,37 +161,25 @@ Keep the current code unchanged.
 **Options on the table**: [A], [B], [C]
 
 **Constraints active at this moment**:
-- [Constraint] — source: [file, line, or person who established it]
+- [Constraint] — source: [file, line, or person]
 
 **Eliminated approaches**:
 
 | Approach | Rejection category | Reason | Revisit condition |
 |---|---|---|---|
-| [Approach A] | `TECHNICAL_INFEASIBLE` \| `BREAKS_EXISTING_CONSTRAINT` \| `COST_TOO_HIGH` \| `DEFERRED` \| `SUPERSEDED` | [Specific reason] | [Condition under which this would be worth re-evaluating, or "Not worth revisiting"] |
+| [Approach A] | `TECHNICAL_INFEASIBLE` \| `BREAKS_EXISTING_CONSTRAINT` \| `COST_TOO_HIGH` \| `DEFERRED` \| `SUPERSEDED` | [Specific reason] | [Condition, or "Not worth revisiting"] |
 | [Approach B] | | | |
 
 **Proceeding with**: [Approach C]
 
-**Decided by**: `AI proposed` \| `[OWNER] confirmed` \| `[OWNER] chose`
+**Decided by**: `AI proposed` \| `Owner confirmed` \| `Owner chose`
 
 **Open questions that could change this**:
 - [Question — if answered differently, which approach becomes viable]
 
 ---
 
-### Rejection Category Reference
-
-| Category | Meaning | Revisitable? |
-|---|---|---|
-| `TECHNICAL_INFEASIBLE` | Can't be done given the current stack or constraints | Only if constraints change |
-| `BREAKS_EXISTING_CONSTRAINT` | Violates an established contract, interface, or team boundary | Only if constraint is lifted |
-| `COST_TOO_HIGH` | Technically feasible, wrong effort/risk ratio *at this time* | Yes — when scope or timeline changes |
-| `DEFERRED` | Good idea, wrong time or scope | Yes — explicitly worth revisiting |
-| `SUPERSEDED` | Was the plan, replaced mid-implementation | See RFC Implementation Learnings |
-
----
-
 ## References
 
-- `FileName.java` — L[start]–L[end]: [what's there]
+- `FileName.[ext]` — L[start]–L[end]: [what's there]
 - [External reference if relevant]

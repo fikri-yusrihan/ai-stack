@@ -1,26 +1,23 @@
 # RFC: [Feature Name]
 
+<!-- Status values: Draft | In Review | Approved | In Progress | Done | Superseded | Deferred | Cancelled — GUIDELINES.md § Document Status Lifecycle -->
 | Field | Value |
 |---|---|
 | **PIC(s)** | [Your name] |
 | **Contributors** | — |
 | **Created** | YYYY-MM-DD |
-| **Status** | Draft \| Under Review \| Approved \| ✅ Implemented |
-| **Session PWD** | [Working directory where this opencode session was opened — fill from env on session start] |
-| **Outcome** | [Fill in after implementation: what the final state is in one sentence] |
-| **Related Docs** | [Research doc](./01-research.md) · [Impl Plan](./03-impl-plan.md) · [PR Plan](./05-pr-plan.md) |
+| **Status** | Draft |
+| **Outcome** | [Fill after implementation: one sentence on final state] |
+| **Related Docs** | [Research doc](./01-research.md) · [Impl Plan](./05-impl-plan.md) · [PR Plan](./07-pr-plan.md) |
 
 ---
 
 ## Business Value
 
-> Why does this matter? Be concrete and measurable. Avoid generic claims like "improves maintainability."
+> One or two sentences, or a tight list. What breaks or costs more if this doesn't ship? Be concrete — avoid "improves maintainability."
 >
-> Good: "Adding a new handler type drops from 3 file changes to 1 new class. Reduces time-to-ship for new feature types."
+> Good: "Adding a new component type currently touches 3 files. After this, it touches 1 — extensions need one documented registration step."
 > Bad: "This will make the code cleaner."
-
-- **[Value dimension]**: [Specific measurable impact]
-- **[Value dimension]**: [Specific measurable impact]
 
 ---
 
@@ -37,40 +34,33 @@
 >
 > Name the method, the class, and the line. If there's a subtle interaction between two layers (e.g., a null from a convenience getter is ambiguous because it absorbs two distinct states), explain it here.
 
-`ClassName.methodName()` does [X]. It contains [N] cases on [Y]. Each case:
-1. [Step 1]
-2. [Step 2]
-
 ### Constraints
-
-> What cannot change. Generated code, external contracts, team ownership, deployment constraints.
 
 | Constraint | Why |
 |---|---|
-| [Constraint 1] | [Reason] |
-| [Constraint 2] | [Reason] |
+| [Constraint] | [Reason — trace to file/line or team decision] |
 
 ---
 
 ## Problem Statement
 
-> Number each problem. Be specific. Each problem should trace directly to a concrete pain in the codebase — not a theoretical concern.
+> Number each problem. Each should describe a mechanism that produces a bad outcome — not a symptom, not a wish. A reader should be able to verify the problem by reading the referenced code.
+>
+> Format: [what the code does] → [why that produces the bad outcome].
 
-1. **[Problem name]**: [Specific description with file/method references]
+1. **[Problem name]**: [Description with file/method reference]
 
-2. **[Problem name]**: [Specific description with file/method references]
-
-3. **[Problem name]**: [Specific description with file/method references]
+2. **[Problem name]**: [Description with file/method reference]
 
 ---
 
 ## Success Criteria
 
-> Each criterion must be binary — either it is met or it isn't. No "improved" or "better." Reference the specific problem each criterion solves.
+> Each criterion must be verifiable — either it is met or it isn't. No "improved" or "better." Each criterion should trace to a numbered problem above.
 
-- Adding a new [thing] requires only [N steps]. No existing files are modified. (Solves Problem 1)
-- [Criterion]. (Solves Problem 2)
-- All existing [things] continue to produce identical output. (Verified by tests)
+- [Binary criterion]. (Solves Problem 1)
+- [Binary criterion]. (Solves Problem 2)
+- All existing [tests] pass without modification. (Non-regression)
 
 ---
 
@@ -83,26 +73,8 @@
 
 ### Out-of-scope
 
-- [Related problem explicitly deferred] — deferred to [reason/follow-up]
-- [Adjacent concern] — different concern, not blocking
-
----
-
-## Functional Requirements
-
-| ID | Requirement | Description |
-|---|---|---|
-| FR-1 | [Short name] | [What the system must do] |
-| FR-2 | [Short name] | [What the system must do] |
-
----
-
-## Technical Requirements
-
-| ID | Aspect | Requirement |
-|---|---|---|
-| TR-1 | [Aspect] | [Constraint on how it must be implemented] |
-| TR-2 | [Aspect] | [Constraint] |
+- [Related problem explicitly deferred] — deferred because [reason]
+- [Adjacent concern] — different problem, not blocking
 
 ---
 
@@ -114,33 +86,11 @@
 >
 > A reader who understands this paragraph should find the steps below predictable. If the steps feel surprising, the insight is missing from this paragraph.
 
-### What gets eliminated
-
-> List specifically what goes away. This makes the review scope concrete for the team.
-
-- `FileToDelete.java` — deleted entirely
-- `someMethod()` — removed from `ClassName`
-
-### What gets added
-
-> List new files/classes with a one-line description of each.
-
-- `NewClass.java` — [what it does]
-- `AnotherClass.java` — [what it does]
-
-### Architectural Components
-
-| Component | Type | Role |
-|---|---|---|
-| `ClassName` | New `@Component` / Existing / Modified | [What it does] |
-
----
-
 ### Step 1 — [First design decision]
 
-> Explain the mechanism. Include concrete code showing the before and after where it helps.
+> Explain the mechanism. Lead with *why* before *how*. Show before/after code where the comparison adds something prose cannot.
 
-```java
+```text
 // Before
 [code]
 
@@ -148,13 +98,25 @@
 [code]
 ```
 
----
-
 ### Step 2 — [Second design decision]
 
 [Same pattern]
 
----
+### Structure and boundaries
+
+> Follows the research doc's `Structure conventions` unless a P0 says otherwise (rules: `standards/architecture.md`). A Mermaid component diagram, arrows pointing in the direction of dependency: new units against the existing ones they touch. Mark each boundary that gets an interface (external I/O, stubs, 2+ implementations).
+
+```mermaid
+flowchart TD
+  Entry["[controller / listener]"] --> Svc["[service: orchestrates]"]
+  Svc --> Rules["[rules: decides]"]
+  Svc --> Port["[interface: external boundary]"]
+  Adapter["[adapter: real I/O]"] -.implements.-> Port
+```
+
+| Unit | Package | Responsibility (one sentence) |
+|---|---|---|
+| [name] | [package] | [what it does] |
 
 ### Adding a new [thing] (end-to-end)
 
@@ -167,17 +129,17 @@
 
 ### Special Cases
 
-> Things that cannot follow the generic path. Name each explicitly, explain why, and describe how they're handled.
+> Things that cannot follow the generic path. Name each, explain why it is special, and describe how it is handled. Use a table only if there are 3+ cases with parallel structure; otherwise write it as prose.
 
-| Type | Special behavior | Handling |
+| Case | Why generic doesn't work | Handling |
 |---|---|---|
-| `SOME_CASE` | [Why generic doesn't work] | [How it's handled] |
+| `SOME_TYPE` | [reason] | [how handled] |
 
 ---
 
 ### Flow Diagram
 
-> Use Mermaid. Never ASCII art. See GUIDELINES.md § Diagrams for type selection.
+> Use Mermaid. Choose the right type (see GUIDELINES.md § Diagrams). Only include if the diagram shows something the prose and code do not already make clear.
 
 ```mermaid
 flowchart TD
@@ -191,6 +153,8 @@ flowchart TD
 
 ## Error Handling
 
+> Include only if failure modes are non-trivial — i.e., a reader could not predict error behavior from reading the Solution Design. If failures are straightforward (e.g., "validation error returns existing error type"), skip this section.
+
 | Failure condition | Current behavior | Proposed behavior |
 |---|---|---|
 | [Failure] | [What happens now] | [What happens after] |
@@ -201,9 +165,9 @@ flowchart TD
 
 ### Unit tests
 
-- **Happy path**: [What input, what output, what assertion]
-- **Edge case**: [What edge case, what expected behavior]
-- **Error path**: [What failure condition, what expected behavior]
+- **[Case]**: [What input, what expected output, what assertion]
+- **[Edge case]**: [What edge case, what expected behavior]
+- **[Error path]**: [What failure condition, what expected behavior]
 
 ### Regression tests
 
@@ -213,26 +177,23 @@ flowchart TD
 
 ## Alternatives Considered
 
-> **Phase exit condition**: Every rejected approach must have a rejection category. Empty or vague entries here are not acceptable.
+> **Phase exit condition**: Every rejected approach must have a rejection category and a specific reason for rejection. "It was simpler" is not a reason — trace the rejection to a code constraint, a team decision, or an explicit tradeoff.
 >
 > Rejection categories: `TECHNICAL_INFEASIBLE` · `BREAKS_EXISTING_CONSTRAINT` · `COST_TOO_HIGH` · `DEFERRED` · `SUPERSEDED`
 
 ### 1. [Alternative name]
 
-**Rejection category**: `TECHNICAL_INFEASIBLE` | `BREAKS_EXISTING_CONSTRAINT` | `COST_TOO_HIGH` | `DEFERRED` | `SUPERSEDED`
+**Rejection category**: [category]
 
-**Revisit condition**: [Condition under which this is worth re-evaluating, or "Not worth revisiting — [reason]"]
+**Revisit condition**: [When this becomes viable, or "Not worth revisiting — [reason]"]
 
-[Description]
-
-- **Pros**: [Why it's appealing]
-- **Cons**: [Specific reason it was rejected — trace to a constraint or codebase fact]
+[One paragraph. Why it was appealing, why it was rejected. Be specific.]
 
 ---
 
 ## Unresolved Questions
 
-> Questions that need answers before or during implementation. Mark as resolved when answered.
+> Questions that need answers before or during implementation.
 
 - [ ] **[Question]**: [Why it matters] — options: [A], [B], [C]
 - [x] **[Resolved question]**: [Decision made and why]
@@ -241,11 +202,11 @@ flowchart TD
 
 ## Known Limitations
 
-> Things the solution intentionally does NOT solve. Be explicit so reviewers don't expect them.
+> Explicit list of what this solution intentionally does not solve. Prevents reviewers from expecting things that were out of scope.
 
 ### [Limitation name]
 
-[What it is and why it's out of scope. Include a path to full resolution if it exists.]
+[What it is, why it's out of scope, path to full resolution if one exists.]
 
 ---
 
@@ -255,31 +216,21 @@ flowchart TD
 
 ---
 
-## Next Steps
-
-| # | Action | Status |
-|---|---|---|
-| 1 | Resolve unresolved questions | ⏳ |
-| 2 | Review and approve RFC | ⏳ |
-| 3 | [Implementation task] | ⏳ |
-
----
-
 ## Implementation Learnings
 
-> Fill in AFTER implementation. Document every design pivot that differed from this RFC. Future engineers reading this should understand what changed and why.
+> Fill in AFTER implementation. One entry per design pivot that differed from this RFC. A future engineer reading this should understand what changed and why — not just what the final state is.
 
-### 1. [Learning title]
+### 1. [Title]
 
 **Original plan**: [What the RFC said]
 
 **What actually happened**: [What changed during implementation]
 
-**Benefit / reason**: [Why the pivot was made]
+**Why**: [What you discovered that the plan didn't anticipate]
 
 ---
 
 ## References
 
 - [Research doc](./01-research.md)
-- `FileName.java` — L[start]–L[end]: [what's there]
+- `FileName.[ext]` — L[start]–L[end]: [what's there]
